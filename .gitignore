@@ -67,3 +67,4 @@ cloudshell_config.yml
 deployment/
 
 *.pdf
+.README.md.html

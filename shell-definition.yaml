@@ -1,12 +1,11 @@
-description: 'Spirent TestCenter chassis shell'
-
+description: Spirent TestCenter chassis shell
 imports:
-- cloudshell_standard: cloudshell_traffic_generator_chassis_standard_1_1_0.yaml
+- cloudshell_standard: cloudshell_traffic_generator_chassis_standard_1_0_3.yaml
 metadata:
   template_author: Quali
   template_icon: shell-icon.png
   template_name: STC Chassis Shell 2G
-  template_version: 2.0.0
+  template_version: 2.0.1
 node_types:
   vendor.STC Chassis Shell 2G:
     artifacts:
@@ -23,6 +22,8 @@ node_types:
             type: string
           Controller TCP Port:
             type: string
+          Power Management:
+            type: boolean
         type: cloudshell.capabilities.AutoDiscovery
     derived_from: cloudshell.nodes.TrafficGeneratorChassis
 tosca_definitions_version: tosca_simple_yaml_1_0
