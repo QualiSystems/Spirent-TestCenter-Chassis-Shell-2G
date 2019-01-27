@@ -134,4 +134,4 @@ class StcHandler(object):
 
     def _get_max_speed(self, supported_speeds):
         mb_speeds = list(float(s[:-1]) if s[-1] == 'M' else float(s[:-1])*1000 for s in supported_speeds)
-        return str(int(max(mb_speeds)))
+        return str(int(max(mb_speeds))) if mb_speeds else '100'

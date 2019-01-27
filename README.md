@@ -2,9 +2,9 @@
 
 # **STC-Chassis-Shell-2G**  
 
-Release date: October 2018
+Release date: January 2019
 
-Shell version: 2.0.1
+Shell version: 2.0.2
 
 Document version: 1.0.0
 
@@ -83,7 +83,7 @@ The attribute names and types are listed in the following table:
 |CS_TrafficGeneratorModule.Model Name|string||The catalog name of the STC module model. This attribute will be displayed in CloudShell instead of the CloudShell model.|
 |STC Chassis Shell 2G.GenericTrafficGeneratorModule.Serial Number|string||The serial number of the STC module.|
 |STC Chassis Shell 2G.GenericTrafficGeneratorModule.Version|string||The firmware version of the STC module.|
-|CS_TrafficGeneratorPort.Configured Controllers|string||Specifies what controller can be used with the ports (IxLoad controller, BP controller etc...)|
+|CS_TrafficGeneratorPort.Configured Controllers|string||Specifies what controller can be used with the ports (STC controller, Avalanche controller etc...)|
 |CS_TrafficGeneratorPort.Logical Name|string||The port's logical name in the test configuration. If kept emtpy - allocation will applied in the blue print.|
 |CS_TrafficGeneratorPort.Max Speed|string||Max speed supported by the interface (default units - MB).|
 |STC Chassis Shell 2G.CS_TrafficGeneratorPort.Media Type|string||Interface media type. Possible values are Fiber and/or Copper (comma-separated).|
@@ -222,8 +222,8 @@ To suggest an idea for the product, see [Quali's Idea box](https://community.qua
 To connect with Quali users and experts from around the world, ask questions and discuss issues, see [Quali's Community forums](https://community.quali.com/forums). 
 
 # Release Notes 
-### What's New
-* NA - first release
 
-### Known Issues
-* NA - first release
+For release updates, see the shell's [GitHub releases page](https://github.com/QualiSystems/Spirent-TestCenterChassis-Shell-2G/releases).
+
+## Known Issues
+**NA**
