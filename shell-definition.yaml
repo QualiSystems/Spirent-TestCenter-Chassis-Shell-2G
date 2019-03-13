@@ -5,16 +5,16 @@ metadata:
   template_author: Quali
   template_icon: shell-icon.png
   template_name: STC Chassis Shell 2G
-  template_version: 2.0.2
+  template_version: 2.1.0
 node_types:
   vendor.STC Chassis Shell 2G:
-    artifacts:
-      driver:
-        file: StcChassisShell2GDriver.zip
-        type: tosca.artifacts.File
-      icon:
-        file: shell-icon.png
-        type: tosca.artifacts.File
+    derived_from: cloudshell.nodes.TrafficGeneratorChassis
+    properties:
+      Split Dual Media:
+        description: True - create port per each media type, False - create single port for all media types.
+        type: boolean
+        default: False
+        tags: [configuration]
     capabilities:
       auto_discovery_capability:
         properties:
@@ -24,6 +24,14 @@ node_types:
             type: string
           Power Management:
             type: boolean
+          Split Dual Media:
+            type: boolean
         type: cloudshell.capabilities.AutoDiscovery
-    derived_from: cloudshell.nodes.TrafficGeneratorChassis
+    artifacts:
+      driver:
+        file: StcChassisShell2GDriver.zip
+        type: tosca.artifacts.File
+      icon:
+        file: shell-icon.png
+        type: tosca.artifacts.File
 tosca_definitions_version: tosca_simple_yaml_1_0

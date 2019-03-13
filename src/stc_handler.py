@@ -28,6 +28,7 @@ class StcHandler(object):
         :rtype: cloudshell.shell.core.driver_context.AutoLoadDetails
         """
 
+        self.split_dual_media = context.resource.attributes['STC Chassis Shell 2G.Split Dual Media']
         self.resources = []
         self.attributes = []
         address = context.resource.address
@@ -80,16 +81,23 @@ class StcHandler(object):
                                     name='PG' + port_group.attributes['Index'],
                                     relative_address=relative_address)
         self.resources.append(resource)
+        media_types = (['Copper', 'Fiber'] if self.split_dual_media and port_group.parent.attributes['IsDualMedia'] else
+            [None])
         for port in port_group.ports.values():
-            self._get_port(relative_address, port)
+            for media_type in media_types:
+                self._get_port(relative_address, port, media_type)
 
-    def _get_port(self, port_group_address, port):
+    def _get_port(self, port_group_address, port, media_type):
         """ Get port resource and attributes. """
 
         relative_address = port_group_address + '/P' + port.attributes['Index']
         model = 'STC Chassis Shell 2G.GenericTrafficGeneratorPort'
+        name = 'Port' + port.attributes['Index']
+        if media_type:
+            relative_address += media_type[0]
+            name += media_type
         resource = AutoLoadResource(model=model,
-                                    name='Port' + port.attributes['Index'],
+                                    name=name,
                                     relative_address=relative_address)
         self.resources.append(resource)
         max_speed = self._get_max_speed(port.parent.parent.attributes['SupportedSpeeds'])
