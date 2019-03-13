@@ -36,7 +36,7 @@ To model an **STC** device in CloudShell, use the following controllers, which p
 ▪ <a href="https://community.quali.com/repos/1280/spirent-test-center-controller-shel" target="_blank">**Spirent-TestCenterControllerController-Shell**</a>
 
 ### Standard version
-**STC-c-2G 2.0.1** is based on the Traffic Shell Standard **1_0_3**.
+**STC-c-2G 2.1.0** is based on the Traffic Shell Standard **1_0_3**.
 
 ### Supported OS
 ▪ **Windows**
@@ -77,6 +77,7 @@ The attribute names and types are listed in the following table:
 |STC Chassis Shell 2G.Client Install Path|string||NA for this resource.|
 |STC Chassis Shell 2G.Controller Address|string||The IP address of the REST or Lab server.|
 |STC Chassis Shell 2G.Controller TCP Port|string||The TCP port of the REST or Lab server.|
+|STC Chassis Shell 2G.Split Dual Media|boolean|True|True - each dual media port will be represented as two ports.|
 |STC Chassis Shell 2G.Password|string||NA for this resource.|
 |STC Chassis Shell 2G.Power Management|boolean|True|Used by the power management orchestration, if enabled, to determine whether to automatically manage the device power status.|
 |STC Chassis Shell 2G.User|string||NA for this resource.|
