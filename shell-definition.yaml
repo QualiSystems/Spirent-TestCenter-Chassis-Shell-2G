@@ -8,13 +8,13 @@ metadata:
   template_version: 2.1.0
 node_types:
   vendor.STC Chassis Shell 2G:
-    derived_from: cloudshell.nodes.TrafficGeneratorChassis
-    properties:
-      Split Dual Media:
-        description: True - create port per each media type, False - create single port for all media types.
-        type: boolean
-        default: False
-        tags: [configuration]
+    artifacts:
+      driver:
+        file: StcChassisShell2GDriver.zip
+        type: tosca.artifacts.File
+      icon:
+        file: shell-icon.png
+        type: tosca.artifacts.File
     capabilities:
       auto_discovery_capability:
         properties:
@@ -27,11 +27,13 @@ node_types:
           Split Dual Media:
             type: boolean
         type: cloudshell.capabilities.AutoDiscovery
-    artifacts:
-      driver:
-        file: StcChassisShell2GDriver.zip
-        type: tosca.artifacts.File
-      icon:
-        file: shell-icon.png
-        type: tosca.artifacts.File
+    derived_from: cloudshell.nodes.TrafficGeneratorChassis
+    properties:
+      Split Dual Media:
+        default: false
+        description: True - create port per each media type, False - create single
+          port for all media types.
+        tags:
+        - configuration
+        type: boolean
 tosca_definitions_version: tosca_simple_yaml_1_0
