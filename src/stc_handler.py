@@ -1,4 +1,3 @@
-
 from cloudshell.shell.core.driver_context import AutoLoadDetails, AutoLoadResource, AutoLoadAttribute
 from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
 
@@ -52,8 +51,8 @@ class StcHandler(object):
             if module.attributes['Model']:
                 self._get_module(module)
 
-#         for power_supply in chassis.pss.values():
-#             self._get_power_supply(power_supply)
+    #         for power_supply in chassis.pss.values():
+    #             self._get_power_supply(power_supply)
 
     def _get_module(self, module):
         """ Get module resource and attributes. """
@@ -82,7 +81,7 @@ class StcHandler(object):
                                     relative_address=relative_address)
         self.resources.append(resource)
         media_types = (['Copper', 'Fiber'] if self.split_dual_media and port_group.parent.attributes['IsDualMedia'] else
-            [None])
+                       [None])
         for port in port_group.ports.values():
             for media_type in media_types:
                 self._get_port(relative_address, port, media_type)
@@ -108,6 +107,13 @@ class StcHandler(object):
         self.attributes.append(AutoLoadAttribute(relative_address=relative_address,
                                                  attribute_name='CS_TrafficGeneratorPort.Configured Controllers',
                                                  attribute_value=configured_controllers))
+
+        # Natti Extension; Add media type as autoload attribute
+        if media_type:
+            media_type_attr_key = 'STC Chassis Shell 2G.GenericTrafficGeneratorPort.Media Type'
+            self.attributes.append(AutoLoadAttribute(relative_address=relative_address,
+                                                     attribute_name=media_type_attr_key,
+                                                     attribute_value=media_type))
 
     def _get_power_supply(self, power_supply):
         """ get power supplies resource and attributes. """
@@ -141,5 +147,5 @@ class StcHandler(object):
                                         attributeValue=port_logic_name)
 
     def _get_max_speed(self, supported_speeds):
-        mb_speeds = list(float(s[:-1]) if s[-1] == 'M' else float(s[:-1])*1000 for s in supported_speeds)
+        mb_speeds = list(float(s[:-1]) if s[-1] == 'M' else float(s[:-1]) * 1000 for s in supported_speeds)
         return str(int(max(mb_speeds))) if mb_speeds else '100'
