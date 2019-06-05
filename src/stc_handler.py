@@ -88,7 +88,6 @@ class StcHandler(object):
 
     def _get_port(self, port_group_address, port, media_type):
         """ Get port resource and attributes. """
-
         relative_address = port_group_address + '/P' + port.attributes['Index']
         model = 'STC Chassis Shell 2G.GenericTrafficGeneratorPort'
         name = 'Port' + port.attributes['Index']
@@ -109,11 +108,22 @@ class StcHandler(object):
                                                  attribute_value=configured_controllers))
 
         # Natti Extension; Add media type as autoload attribute
-        if media_type:
+        if self.split_dual_media:
             media_type_attr_key = 'STC Chassis Shell 2G.GenericTrafficGeneratorPort.Media Type'
             self.attributes.append(AutoLoadAttribute(relative_address=relative_address,
                                                      attribute_name=media_type_attr_key,
                                                      attribute_value=media_type))
+
+        # Natti Extension; Add module version to port level for easier Abstract Resource resolution
+        parent_module_model_key = 'STC Chassis Shell 2G.GenericTrafficGeneratorPort.Module Model Name'
+        self.attributes.append(AutoLoadAttribute(relative_address=relative_address,
+                                                 attribute_name=parent_module_model_key,
+                                                 attribute_value=port.parent.parent.attributes["Model"]))
+
+        parent_module_serial_key = 'STC Chassis Shell 2G.GenericTrafficGeneratorPort.Module Serial Number'
+        self.attributes.append(AutoLoadAttribute(relative_address=relative_address,
+                                                 attribute_name=parent_module_serial_key,
+                                                 attribute_value=port.parent.parent.attributes["SerialNum"]))
 
     def _get_power_supply(self, power_supply):
         """ get power supplies resource and attributes. """
