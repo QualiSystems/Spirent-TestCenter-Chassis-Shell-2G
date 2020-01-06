@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """
 Tests for `TestCenterChassisDriver`
 """
@@ -8,13 +5,17 @@ Tests for `TestCenterChassisDriver`
 import sys
 import logging
 
-from shellfoundry.releasetools.test_helper import create_autoload_context_2g
+from shellfoundry.releasetools.test_helper import create_session_from_deployment, create_autoload_context_2g
 
 from src.driver import TestCenterChassisDriver
 
-address = '192.168.42.152'
+address = '192.168.42.157'
 controller = 'localhost'
 port = '8888'
+
+attributes = {'STC Chassis Shell 2G.Controller Address': controller,
+              'STC Chassis Shell 2G.Controller TCP Port': port,
+              'STC Chassis Shell 2G.Split Dual Media': True}
 
 
 module_name = [
@@ -31,9 +32,8 @@ module_name = [
 class TestStcChassisDriver(object):
 
     def setup(self):
-        self.context = create_autoload_context_2g(model='STC Chassis Shell 2G', address=address, controller=controller,
-                                                  port=port)
-        self.context.resource.attributes['STC Chassis Shell 2G.Split Dual Media'] = True
+        self.session = create_session_from_deployment()
+        self.context = create_autoload_context_2g(self.session, 'STC Chassis Shell 2G', address, attributes)
         self.driver = TestCenterChassisDriver()
         self.driver.initialize(self.context)
         self.driver.logger.addHandler(logging.StreamHandler(sys.stdout))
