@@ -36,4 +36,13 @@ node_types:
         tags:
         - configuration
         type: boolean
+#     ### Natti Attribute additions ###
+      GenericTrafficGeneratorPort.Module Model Name:
+        description: model name taken from parent module
+        type: string
+        tags: [user_input, configuration, setting, search_filter, abstract_filter, readonly_to_users]
+      GenericTrafficGeneratorPort.Module Serial Number:
+        description: serial number taken from parent module
+        type: string
+        tags: [user_input, configuration, setting, search_filter, abstract_filter, readonly_to_users]
 tosca_definitions_version: tosca_simple_yaml_1_0

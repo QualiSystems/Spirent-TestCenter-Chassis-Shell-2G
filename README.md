@@ -2,7 +2,7 @@
 
 # **STC-Chassis-Shell-2G**  
 
-Release date: January 2019
+Release date: June 2019
 
 Shell version: 2.0.2
 
@@ -230,3 +230,8 @@ For release updates, see the shell's [GitHub releases page](https://github.com/Q
 
 ## Known Issues
 **NA**
+
+## Dual Media Branch Changes
+- Media Type attribute populated during autoload for use in abstract resolution
+- 'Module Serial Number' and 'Module Model Name' added as custom attributes to port level for help in abstract resolution 
+- Be sure to add these custom attributes to port level of shell before running autoload
