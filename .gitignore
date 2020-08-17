@@ -68,3 +68,5 @@ deployment/
 
 *.pdf
 .README.md.html
+
+venv*

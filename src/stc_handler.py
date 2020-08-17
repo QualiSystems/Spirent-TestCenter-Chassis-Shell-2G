@@ -1,137 +1,96 @@
 
-from cloudshell.shell.core.driver_context import AutoLoadDetails, AutoLoadResource, AutoLoadAttribute
-from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
+import logging
+
+from cloudshell.shell.core.driver_context import AutoLoadDetails, InitCommandContext, AutoLoadCommandContext
+from cloudshell.traffic.tg import TgChassisHandler
 
 from trafficgenerator.tgn_utils import ApiType
 from testcenter.stc_app import init_stc
+from testcenter import StcPhyChassis, StcPhyModule, StcPhyPortGroup, StcPhyPort
+
+from stc_data_model import (STC_Chassis_Shell_2G, GenericTrafficGeneratorModule, GenericTrafficGeneratorPortGroup,
+                            GenericTrafficGeneratorPort, GenericPowerPort)
 
 
-class StcHandler(object):
+class StcHandler(TgChassisHandler):
 
-    def initialize(self, context, logger):
-        """
-        :type context: cloudshell.shell.core.driver_context.InitCommandContext
-        """
+    def initialize(self, context: InitCommandContext, logger: logging.Logger) -> None:
+        resource = STC_Chassis_Shell_2G.create_from_context(context)
+        super().initialize(resource, logger)
 
-        self.logger = logger
+    def load_inventory(self, context: AutoLoadCommandContext) -> AutoLoadDetails:
+        """ Return device structure with all standard attributes. """
 
-        controller = context.resource.attributes['STC Chassis Shell 2G.Controller Address']
-        port = context.resource.attributes['STC Chassis Shell 2G.Controller TCP Port']
+        controller = self.resource.controller_address
+        self.logger.debug(f'Controller - {controller}')
+        port = self.resource.controller_tcp_port
         port = int(port) if port else 80
+        self.logger.debug(f'Port - {port}')
         self.stc = init_stc(ApiType.rest, self.logger, rest_server=controller, rest_port=port)
         self.stc.connect()
 
-    def get_inventory(self, context):
-        """ Return device structure with all standard attributes
-
-        :type context: cloudshell.shell.core.driver_context.AutoLoadCommandContext
-        :rtype: cloudshell.shell.core.driver_context.AutoLoadDetails
-        """
-
-        self.resources = []
-        self.attributes = []
-        address = context.resource.address
-        chassis = self.stc.hw.get_chassis(address)
+        chassis = self.stc.hw.get_chassis(context.resource.address)
         chassis.get_inventory()
-        self._get_chassis(chassis)
-        details = AutoLoadDetails(self.resources, self.attributes)
-        return details
+        self._load_chassis(chassis)
+        return self.resource.create_autoload_details()
 
-    def _get_chassis(self, chassis):
+    def _load_chassis(self, chassis: StcPhyChassis) -> None:
         """ Get chassis resource and attributes. """
 
-        self._get_attributes('',
-                             {'CS_TrafficGeneratorChassis.Model Name': chassis.attributes['Model'],
-                              'STC Chassis Shell 2G.Serial Number': chassis.attributes['SerialNum'],
-                              'STC Chassis Shell 2G.Server Description': '',
-                              'CS_TrafficGeneratorChassis.Vendor': 'Spirent',
-                              'CS_TrafficGeneratorChassis.Version': chassis.attributes['FirmwareVersion']})
+        self.resource.model_name = chassis.attributes['Model']
+        self.resource.serial_number = chassis.attributes['SerialNum']
+        self.resource.vendor = 'Spirent'
+        self.resource.version = chassis.attributes['FirmwareVersion']
 
         for module in chassis.modules.values():
-            if module.attributes['Model']:
-                self._get_module(module)
+            if module.get_attributes('Model'):
+                self._load_module(module)
 
 #         for power_supply in chassis.pss.values():
-#             self._get_power_supply(power_supply)
+#             self._load_power_supply(power_supply)
 
-    def _get_module(self, module):
+    def _load_module(self, module: StcPhyModule) -> None:
         """ Get module resource and attributes. """
 
-        relative_address = 'M' + module.attributes['Index']
-        model = 'STC Chassis Shell 2G.GenericTrafficGeneratorModule'
-        resource = AutoLoadResource(model=model,
-                                    name='Module' + module.attributes['Index'],
-                                    relative_address=relative_address)
-        self.resources.append(resource)
-        self._get_attributes(relative_address,
-                             {'CS_TrafficGeneratorModule.Model Name': module.attributes['Model'],
-                              model + '.Serial Number': module.attributes['SerialNum'],
-                              model + '.Version': module.attributes['FirmwareVersion']})
+        module_id = module.attributes['Index']
+        gen_module = GenericTrafficGeneratorModule(f'Module{module_id}')
+        self.resource.add_sub_resource(f'M{module_id}', gen_module)
+        gen_module.model_name = module.attributes['Model']
+        gen_module.serial_number = module.attributes['SerialNum']
+        gen_module.version = module.attributes['FirmwareVersion']
 
         for port_group in module.pgs.values():
-            self._get_port_group(relative_address, port_group)
+            self._load_port_group(gen_module, port_group)
 
-    def _get_port_group(self, module_address, port_group):
+    def _load_port_group(self, gen_module: GenericTrafficGeneratorModule, port_group: StcPhyPortGroup) -> None:
         """ Get port group resource and attributes. """
 
-        relative_address = module_address + '/PG' + port_group.attributes['Index']
-        model = 'STC Chassis Shell 2G.GenericTrafficGeneratorPortGroup'
-        resource = AutoLoadResource(model=model,
-                                    name='PG' + port_group.attributes['Index'],
-                                    relative_address=relative_address)
-        self.resources.append(resource)
-        for port in port_group.ports.values():
-            self._get_port(relative_address, port)
+        pg_id = port_group.attributes['Index']
+        gen_pg = GenericTrafficGeneratorPortGroup(f'PG{pg_id}')
+        gen_module.add_sub_resource(f'PG{pg_id}', gen_pg)
 
-    def _get_port(self, port_group_address, port):
+        for port in port_group.ports.values():
+            self._load_port(gen_pg, port)
+
+    def _load_port(self, gen_pg: GenericTrafficGeneratorPortGroup, port: StcPhyPort) -> None:
         """ Get port resource and attributes. """
 
-        relative_address = port_group_address + '/P' + port.attributes['Index']
-        model = 'STC Chassis Shell 2G.GenericTrafficGeneratorPort'
-        resource = AutoLoadResource(model=model,
-                                    name='Port' + port.attributes['Index'],
-                                    relative_address=relative_address)
-        self.resources.append(resource)
-        max_speed = self._get_max_speed(port.parent.parent.attributes['SupportedSpeeds'])
-        self.attributes.append(AutoLoadAttribute(relative_address=relative_address,
-                                                 attribute_name='CS_TrafficGeneratorPort.Max Speed',
-                                                 attribute_value=max_speed))
-        configured_controllers = 'STC' if port.parent.attributes['TestPackage'] == 'stc' else 'Avalanche'
-        self.attributes.append(AutoLoadAttribute(relative_address=relative_address,
-                                                 attribute_name='CS_TrafficGeneratorPort.Configured Controllers',
-                                                 attribute_value=configured_controllers))
+        port_id = port.attributes['Index']
+        gen_port = GenericTrafficGeneratorPort(f'Port{port_id}')
+        gen_pg.add_sub_resource(f'P{port_id}', gen_port)
 
-    def _get_power_supply(self, power_supply):
+        max_speed = self._get_max_speed(port.parent.parent.attributes['SupportedSpeeds'])
+        gen_port.max_speed = max_speed
+        configured_controllers = 'STC' if port.parent.attributes['TestPackage'] == 'stc' else 'Avalanche'
+        gen_port.configured_controllers = configured_controllers
+
+    def _load_power_supply(self, power_supply):
         """ get power supplies resource and attributes. """
 
-        relative_address = 'PP' + power_supply.attributes['Index']
-        resource = AutoLoadResource(model='Generic Power Port', name='PP' + power_supply.attributes['Index'],
-                                    relative_address=relative_address)
-        self.resources.append(resource)
+        pp_id = power_supply.attributes['Index']
+        gen_pp = GenericPowerPort(f'PP{pp_id}')
+        self.resource.add_sub_resource(f'PP{pp_id}', gen_pp)
 
-    def _get_attributes(self, relative_address, attributes):
-        """ Get attributes. """
-
-        for attribute_name, attribute_value in attributes.items():
-            self.attributes.append(AutoLoadAttribute(relative_address=relative_address,
-                                                     attribute_name=attribute_name,
-                                                     attribute_value=attribute_value))
-
-    def set_port_attribute(self, context, port_name):
-        """
-
-        :param context:
-        :param port_name: String example :'TestCenter Chassis 222/Module9/Port Group3/Port3':'TCP'
-        :return:
-        """
-        splited_name = port_name.split(":")
-        port_full_name = splited_name[0]
-        port_logic_name = splited_name[1]
-
-        my_api = CloudShellSessionContext(context).get_api()
-        return my_api.SetAttributeValue(resourceFullPath=port_full_name, attributeName="Logical Name",
-                                        attributeValue=port_logic_name)
-
-    def _get_max_speed(self, supported_speeds):
+    def _get_max_speed(self, supported_speeds: str) -> str:
         mb_speeds = list(float(s[:-1]) if s[-1] == 'M' else float(s[:-1])*1000 for s in supported_speeds)
         return str(int(max(mb_speeds))) if mb_speeds else '100'
