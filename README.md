@@ -189,7 +189,7 @@ You can also modify existing resources, see [Managing Resources in the Inventory
   
   4. Click **Create**.
   
-  5. In the **Resource** dialog box, enter the **Controller IP Address** and **Controller TCP Port**, see [Device Name Attributes](*device-name-attributes). 
+  5. In the **Resource** dialog box, enter the **Controller Address** and **Controller TCP Port**, see [STC Attributes](#stc-attributes). 
   
   6. Click **Continue**.
 
