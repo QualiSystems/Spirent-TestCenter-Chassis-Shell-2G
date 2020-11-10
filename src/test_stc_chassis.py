@@ -15,9 +15,9 @@ from shellfoundry.releasetools.test_helper import (create_session_from_deploymen
 from src.stc_driver import TestCenterChassisDriver
 
 
-@pytest.fixture(params=[('192.168.65.22', 'localhost', '8888')])
+@pytest.fixture(params=[('192.168.65.28', 'localhost', '8888')])
 def dut(request: SubRequest) -> list:
-    yield request.param
+    return request.param
 
 
 @pytest.fixture()
