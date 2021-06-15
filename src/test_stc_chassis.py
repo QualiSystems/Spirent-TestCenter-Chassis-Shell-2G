@@ -1,68 +1,70 @@
 """
 Tests for `TestCenterChassisDriver`
 """
-
 import pytest
 from _pytest.fixtures import SubRequest
 
-from cloudshell.api.cloudshell_api import CloudShellAPISession, AttributeNameValue
+from cloudshell.api.cloudshell_api import CloudShellAPISession, AttributeNameValue, ResourceInfo
 from cloudshell.shell.core.driver_context import AutoLoadCommandContext
-from cloudshell.traffic.tg import STC_CHASSIS_MODEL
-from shellfoundry.releasetools.test_helper import (create_session_from_deployment, create_init_command_context,
-                                                   create_autoload_resource, create_autoload_context,
-                                                   print_inventory)
+from cloudshell.traffic.tg import TGN_CHASSIS_FAMILY, STC_CHASSIS_MODEL
+from shellfoundry_traffic.test_helpers import create_session_from_config, TestHelpers, print_inventory
 
 from src.stc_driver import TestCenterChassisDriver
 
 
-@pytest.fixture(params=[('192.168.65.28', 'localhost', '8888')])
+@pytest.fixture(params=[('192.168.65.24', 'localhost', '8888')])
 def dut(request: SubRequest) -> list:
     return request.param
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def session() -> CloudShellAPISession:
-    yield create_session_from_deployment()
+    yield create_session_from_config()
+
+
+@pytest.fixture(scope='session')
+def test_helpers(session: CloudShellAPISession) -> TestHelpers:
+    """ Yields initialized TestHelpers object. """
+    yield TestHelpers(session)
 
 
 @pytest.fixture()
-def autoload_context(session: CloudShellAPISession, dut: list) -> AutoLoadCommandContext:
+def driver(test_helpers: TestHelpers, dut: list) -> TestCenterChassisDriver:
     address, controller_address, controller_port = dut
     attributes = {f'{STC_CHASSIS_MODEL}.Controller Address': controller_address,
                   f'{STC_CHASSIS_MODEL}.Controller TCP Port': controller_port}
-    yield create_autoload_context(session, 'CS_TrafficGeneratorChassis', STC_CHASSIS_MODEL, address, attributes)
-
-
-@pytest.fixture()
-def driver(session: CloudShellAPISession, dut: list) -> TestCenterChassisDriver:
-    address, controller_address, controller_port = dut
-    attributes = {f'{STC_CHASSIS_MODEL}.Controller Address': controller_address,
-                  f'{STC_CHASSIS_MODEL}.Controller TCP Port': controller_port}
-    init_context = create_init_command_context(session, 'CS_GenericResource', STC_CHASSIS_MODEL, address, attributes,
-                                               'Resource')
+    init_context = test_helpers.resource_init_command_context(TGN_CHASSIS_FAMILY, STC_CHASSIS_MODEL, address,
+                                                              attributes)
     driver = TestCenterChassisDriver()
     driver.initialize(init_context)
     yield driver
 
 
 @pytest.fixture()
-def autoload_resource(session, dut):
+def autoload_context(test_helpers: TestHelpers, dut: list) -> AutoLoadCommandContext:
+    address, controller_address, controller_port = dut
+    attributes = {f'{STC_CHASSIS_MODEL}.Controller Address': controller_address,
+                  f'{STC_CHASSIS_MODEL}.Controller TCP Port': controller_port}
+    yield test_helpers.autoload_command_context(TGN_CHASSIS_FAMILY, STC_CHASSIS_MODEL, address, attributes)
+
+
+@pytest.fixture()
+def autoload_resource(session: CloudShellAPISession, test_helpers: TestHelpers, dut: list) -> ResourceInfo:
     address, controller_address, controller_port = dut
     attributes = [
         AttributeNameValue(f'{STC_CHASSIS_MODEL}.Controller Address', controller_address),
         AttributeNameValue(f'{STC_CHASSIS_MODEL}.Controller TCP Port', controller_port)]
-    resource = create_autoload_resource(session, 'CS_TrafficGeneratorChassis', STC_CHASSIS_MODEL, address, 'test-stc',
-                                        attributes)
+    resource = test_helpers.create_autoload_resource(STC_CHASSIS_MODEL, 'test-stc', address, attributes)
     yield resource
     session.DeleteResource(resource.Name)
 
 
-def test_autoload(driver, autoload_context):
+def test_autoload(driver: TestCenterChassisDriver, autoload_context: AutoLoadCommandContext) -> None:
     inventory = driver.get_inventory(autoload_context)
     print_inventory(inventory)
 
 
-def test_autoload_session(session, autoload_resource, dut):
+def test_autoload_session(session: CloudShellAPISession, autoload_resource: ResourceInfo, dut: dut) -> ResourceInfo:
     session.AutoLoad(autoload_resource.Name)
     resource_details = session.GetResourceDetails(autoload_resource.Name)
     assert len(resource_details.ChildResources) == 1

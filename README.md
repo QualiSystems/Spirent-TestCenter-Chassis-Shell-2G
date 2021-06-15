@@ -2,9 +2,9 @@
 
 # **STC-Chassis-Shell-2G**  
 
-Release date: January 2019
+Release date: July 2021
 
-Shell version: 2.0.2
+Shell version: 3.0.1
 
 Document version: 1.0.0
 
@@ -36,14 +36,14 @@ To model an **STC** device in CloudShell, use the following controllers, which p
 ▪ <a href="https://community.quali.com/repos/1280/spirent-test-center-controller-shel" target="_blank">**Spirent-TestCenterControllerController-Shell**</a>
 
 ### Standard version
-**STC-c-2G 2.0.1** is based on the Traffic Shell Standard **1_0_3**.
+**STC-Chassis-Shell-2G** is based on the Traffic Shell Standard **1_0_3**.
 
 ### Supported OS
 ▪ **Windows**
 
 ### Requirements
 
-▪ CloudShell version **8.1 and up**
+▪ CloudShell version **9.3 and up**
 
 ▪ STC version **supporting REST server or Lab server**. REST/Lab server must be up and reachable from the Execution server.
 
@@ -110,7 +110,7 @@ The shell comprises:
 |STC.Chassis.Shell.2G.offline.requirements.zip|STC shell Python dependencies (for offline deployments only)|
 
 # Importing and Configuring the Shell
-This section describes how to import the **STC-Chassis-Shell-2G 2.0.1** and configure and modify the shell’s devices.
+This section describes how to import the **STC-Chassis-Shell-2G 3.0.1** and configure and modify the shell’s devices.
 
 ### Importing the shell into CloudShell
 
