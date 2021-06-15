@@ -1,6 +1,11 @@
 -r src/requirements.txt
 
-pytest
 PyYAML
+
+pytest
+pytest-cov
+pytest-isort
+pytest-flake8
+pre-commit
 
 shellfoundry_traffic

@@ -1,11 +1,9 @@
-
 from cloudshell.traffic.tg import TrafficDriver
 
 from stc_handler import StcHandler
 
 
 class TestCenterChassisDriver(TrafficDriver):
-
     def __init__(self):
         self.handler = StcHandler()
 
