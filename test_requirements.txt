@@ -1,11 +1,10 @@
 -r src/requirements.txt
 
-PyYAML
-
 pytest
-pytest-cov
-pytest-isort
-pytest-flake8
+
+# Pipeline
 pre-commit
+pylint
+pylint_pytest
 
 shellfoundry_traffic

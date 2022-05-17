@@ -2,9 +2,9 @@
 
 # **STC-Chassis-Shell-2G**  
 
-Release date: July 2021
+Release date: May 2022
 
-Shell version: 3.0.1
+Shell version: 3.1.0
 
 Document version: 1.0.0
 
