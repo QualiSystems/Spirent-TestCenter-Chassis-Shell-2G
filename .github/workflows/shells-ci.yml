@@ -48,8 +48,7 @@ jobs:
         run: shellfoundry pack
   check-version:
     name: Check version
-    # only for PRs in master
-    if: ${{ github.base_ref == 'master' }}
+    if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -68,13 +67,16 @@ jobs:
           cd ${{ github.event.repository.name }}
           git checkout -qf ${{ github.head_ref }}
           echo "Check that shell version increased"
-          current_version=$(git show master:shell-definition.yaml | yq .metadata.template_version)
+          current_version=$(git describe --tags --abbrev=0)
+          echo "Current shell version $current_version"
           new_version=$(yq .metadata.template_version shell-definition.yaml)
+          new_version=${new_version:1:-1}
+          echo "New shell version $new_version"
           if [[ $current_version < $new_version ]]
           then
             exit 0
           fi
-          echo "New shell version must be greater then $current_version"
+          echo "New shell version $new_version must be greater then $current_version"
           exit 1
   create-gh-release:
     needs: [pre-commit, pack]
@@ -91,9 +93,12 @@ jobs:
         run: |
           sudo apt-get -y install jq
           python -m pip install pip -U
-          pip install tox yq
+          python -m pip install cloudshell-pip-download yq
       - name: Pack and download dependencies
-        run: tox
+        run: |
+          mkdir dist
+          pip-download -r src/requirements.txt -p win32 -py cp39 --to-archive dist/dependencies-win32.zip
+          pip-download -r src/requirements.txt -p linux -py cp39 --to-archive dist/dependencies-linux.zip
       - name: Set envs
         run: |
           version="$(yq -r .metadata.template_version shell-definition.yaml)"

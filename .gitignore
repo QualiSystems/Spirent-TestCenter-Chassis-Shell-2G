@@ -70,3 +70,4 @@ deployment/
 .README.md.html
 
 venv*
+.pip-download-cache

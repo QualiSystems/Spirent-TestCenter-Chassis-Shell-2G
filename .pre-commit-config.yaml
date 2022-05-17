@@ -24,6 +24,10 @@ repos:
           flake8-eradicate,
         ]
         language_version: python3.9
+        args: [
+            --max-line-length=127,
+            '--ignore=D200'
+        ]
   - repo: local
     hooks:
       - id: pylint
