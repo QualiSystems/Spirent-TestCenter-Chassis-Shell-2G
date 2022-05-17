@@ -110,7 +110,7 @@ The shell comprises:
 |STC.Chassis.Shell.2G.offline.requirements.zip|STC shell Python dependencies (for offline deployments only)|
 
 # Importing and Configuring the Shell
-This section describes how to import the **STC-Chassis-Shell-2G 3.0.1** and configure and modify the shell’s devices.
+This section describes how to import the **STC-Chassis-Shell-2G 3.1.0** and configure and modify the shell’s devices.
 
 ### Importing the shell into CloudShell
 
