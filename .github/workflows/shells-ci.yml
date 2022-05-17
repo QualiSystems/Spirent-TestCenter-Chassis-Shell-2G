@@ -43,11 +43,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install pip -U
-          pip install tox
+          pip install shellfoundry
       - name: Build
-        env:
-          TOXENV: pack
-        run: tox
+        run: shellfoundry pack
   check-version:
     name: Check version
     # only for PRs in master
