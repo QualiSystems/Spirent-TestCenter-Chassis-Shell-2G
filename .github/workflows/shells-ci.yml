@@ -79,7 +79,7 @@ jobs:
           echo "New shell version $new_version must be greater then $current_version"
           exit 1
   create-gh-release:
-    needs: [pre-commit, pack]
+    needs: [pre-commit, pack, check-version]
     if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
@@ -94,9 +94,11 @@ jobs:
           sudo apt-get -y install jq
           python -m pip install pip -U
           python -m pip install cloudshell-pip-download yq
+          pip install shellfoundry
+      - name: Build
+        run: shellfoundry pack
       - name: Pack and download dependencies
         run: |
-          mkdir dist
           pip-download -r src/requirements.txt -p win32 -py cp39 --to-archive dist/dependencies-win32.zip
           pip-download -r src/requirements.txt -p linux -py cp39 --to-archive dist/dependencies-linux.zip
       - name: Set envs
