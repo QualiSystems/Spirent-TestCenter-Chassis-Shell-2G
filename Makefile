@@ -5,11 +5,11 @@ password=pypiadmin
 
 install:
 	python -m pip install -U pip
-	pip install --extra-index-url http://$(repo):8036 --trusted-host $(repo) -U --pre -r requirements-dev.txt
+	pip install -i http://$(repo):8036 --trusted-host $(repo) -U --pre -r requirements-dev.txt
 
 .PHONY: build
 build:
 	shellfoundry install
 
 download:
-	pip download --extra-index-url http://$(repo):8036 --trusted-host $(repo) --pre -r src/requirements.txt -d dist/downloads
+	pip download -i http://$(repo):8036 --trusted-host $(repo) --pre -r requirements-dev.txt -d dist/downloads

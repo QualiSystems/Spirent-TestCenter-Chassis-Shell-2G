@@ -11,30 +11,30 @@ from cloudshell.shell.core.driver_context import AutoLoadCommandContext
 from cloudshell.traffic.tg import STC_CHASSIS_MODEL, TGN_CHASSIS_FAMILY
 from shellfoundry_traffic.test_helpers import TestHelpers, create_session_from_config, print_inventory
 
-from src.stc_driver import TestCenterChassisDriver
+from stc_driver import TestCenterChassisDriver
 
 
 @pytest.fixture(params=[("192.168.65.31", "localhost", "9090")])
 def dut(request: SubRequest) -> list:
-    """Yields STC device under test parameters."""
+    """Yield STC device under test parameters."""
     return request.param
 
 
 @pytest.fixture(scope="session")
 def session() -> CloudShellAPISession:
-    """Yields session."""
+    """Yield session."""
     return create_session_from_config()
 
 
 @pytest.fixture(scope="session")
 def test_helpers(session: CloudShellAPISession) -> TestHelpers:
-    """Yields initialized TestHelpers object."""
+    """Yield initialized TestHelpers object."""
     return TestHelpers(session)
 
 
 @pytest.fixture()
 def driver(test_helpers: TestHelpers, dut: list) -> Iterable[TestCenterChassisDriver]:
-    """Yields initialized TestCenterChassisDriver."""
+    """Yield initialized TestCenterChassisDriver."""
     address, controller_address, controller_port = dut
     attributes = {
         f"{STC_CHASSIS_MODEL}.Controller Address": controller_address,
@@ -49,7 +49,7 @@ def driver(test_helpers: TestHelpers, dut: list) -> Iterable[TestCenterChassisDr
 
 @pytest.fixture()
 def autoload_context(test_helpers: TestHelpers, dut: list) -> AutoLoadCommandContext:
-    """Yields STC chassis resource for shell autoload testing."""
+    """Yield STC chassis resource for shell autoload testing."""
     address, controller_address, controller_port = dut
     attributes = {
         f"{STC_CHASSIS_MODEL}.Controller Address": controller_address,
@@ -60,7 +60,7 @@ def autoload_context(test_helpers: TestHelpers, dut: list) -> AutoLoadCommandCon
 
 @pytest.fixture()
 def autoload_resource(session: CloudShellAPISession, test_helpers: TestHelpers, dut: list) -> Iterable[ResourceInfo]:
-    """Yields STC resource for shell autoload testing."""
+    """Yield STC resource for shell autoload testing."""
     address, controller_address, controller_port = dut
     attributes = [
         AttributeNameValue(f"{STC_CHASSIS_MODEL}.Controller Address", controller_address),
