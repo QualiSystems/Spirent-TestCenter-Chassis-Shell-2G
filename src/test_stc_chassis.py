@@ -55,7 +55,7 @@ def autoload_context(test_helpers: TestHelpers, dut: list) -> AutoLoadCommandCon
         f"{STC_CHASSIS_MODEL}.Controller Address": controller_address,
         f"{STC_CHASSIS_MODEL}.Controller TCP Port": controller_port,
     }
-    yield test_helpers.autoload_command_context(TGN_CHASSIS_FAMILY, STC_CHASSIS_MODEL, address, attributes)
+    return test_helpers.autoload_command_context(TGN_CHASSIS_FAMILY, STC_CHASSIS_MODEL, address, attributes)
 
 
 @pytest.fixture()
